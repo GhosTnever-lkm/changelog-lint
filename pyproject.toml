@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "changelog-lint"
+version = "0.1.0"
+description = "Validate CHANGELOG.md against Keep a Changelog: sections, dates, version order, link definitions."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = []
+
+[project.scripts]
+changelog-lint = "changelog_lint.cli:main"
