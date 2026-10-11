@@ -5,6 +5,12 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-11
+
+### Added
+
+- CI now also runs the test suite on Windows (windows-latest), not only Ubuntu.
+
 ## [0.1.1] - 2026-10-11
 
 ### Added
@@ -20,5 +26,6 @@
 - Пример [examples/CHANGELOG.md](examples/CHANGELOG.md), тесты и workflow CI.
 - CONTRIBUTING.md и SECURITY.md.
 
+[0.1.2]: https://github.com/GhosTnever-lkm/changelog-lint/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/GhosTnever-lkm/changelog-lint/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/GhosTnever-lkm/changelog-lint/releases/tag/v0.1.0
