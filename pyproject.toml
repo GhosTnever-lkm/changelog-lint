@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "changelog-lint"
-version = "0.1.0"
+version = "0.1.1"
 description = "Validate CHANGELOG.md against Keep a Changelog: sections, dates, version order, link definitions."
 readme = "README.md"
 requires-python = ">=3.10"
