@@ -13,6 +13,8 @@ UNRELEASED_RE = re.compile(r"^##\s+\[Unreleased\]\s*$", re.IGNORECASE)
 SECTION_RE = re.compile(r"^###\s+(?P<name>.+?)\s*$")
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
 LINK_DEF_RE = re.compile(r"^\[(?P<ver>[^\]]+)\]:\s+\S+")
+FENCE_OPEN_RE = re.compile(r"^\s*(?P<fence>`{3,}|~{3,}).*$")
+FENCE_CLOSE_RE = re.compile(r"^\s*(?P<fence>`{3,}|~{3,})\s*$")
 
 
 @dataclass(frozen=True)
@@ -23,9 +25,16 @@ class Finding:
     message: str
 
 
-def _semver_key(version: str) -> tuple[int, ...]:
-    core = version.split("-", 1)[0]
-    return tuple(int(x) for x in core.split("."))
+def _semver_key(version: str) -> tuple[int, int, int, int, tuple[tuple[int, int | str], ...]]:
+    core, separator, prerelease = version.partition("-")
+    major, minor, patch = (int(part) for part in core.split("."))
+    if not separator:
+        return major, minor, patch, 1, ()
+    identifiers = tuple(
+        (0, int(part)) if part.isdigit() else (1, part)
+        for part in prerelease.split(".")
+    )
+    return major, minor, patch, 0, identifiers
 
 
 def lint(text: str, today: date | None = None) -> list[Finding]:
@@ -40,7 +49,24 @@ def lint(text: str, today: date | None = None) -> list[Finding]:
     current_section_line = None
     in_release = False
     section_names: list[str] = []
+    fence_char = None
+    fence_length = 0
+    content_lines: list[str] = []
     for number, line in enumerate(lines, start=1):
+        if fence_char is not None:
+            closing = FENCE_CLOSE_RE.match(line)
+            if closing and closing.group("fence")[0] == fence_char and len(closing.group("fence")) >= fence_length:
+                fence_char = None
+                fence_length = 0
+            content_lines.append("")
+            continue
+        opening = FENCE_OPEN_RE.match(line)
+        if opening:
+            fence_char = opening.group("fence")[0]
+            fence_length = len(opening.group("fence"))
+            content_lines.append("")
+            continue
+        content_lines.append(line)
         if line.startswith("## "):
             if in_release:
                 _check_sections(findings, section_names, current_section_line)
@@ -90,7 +116,7 @@ def lint(text: str, today: date | None = None) -> list[Finding]:
             findings.append(Finding("error", "ORDER", versions[idx][0], f"release {versions[idx][1]} should be older than {versions[idx - 1][1]}"))
             break
 
-    link_defs = {m.group("ver") for line in lines if (m := LINK_DEF_RE.match(line))}
+    link_defs = {m.group("ver") for line in content_lines if (m := LINK_DEF_RE.match(line))}
     for number, ver in versions:
         if ver not in link_defs:
             findings.append(Finding("warning", "NO_LINK", number, f"release {ver} has no link definition at the bottom"))

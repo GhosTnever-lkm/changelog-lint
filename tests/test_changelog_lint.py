@@ -38,6 +38,22 @@ class RuleTests(unittest.TestCase):
         text = "# C\n\n## [1.0.0] - 2026-01-01\n\n### Added\n\n- a\n\n## [2.0.0] - 2026-02-01\n\n### Added\n\n- b\n"
         self.assertIn("ORDER", codes(text))
 
+    def test_semver_prerelease_sorts_before_stable_release(self):
+        text = "# C\n\n## [Unreleased]\n\n## [1.0.0] - 2026-01-02\n\n### Added\n\n- stable\n\n## [1.0.0-rc.1] - 2026-01-01\n\n### Added\n\n- candidate\n"
+        self.assertNotIn("ORDER", codes(text))
+
+    def test_numeric_prerelease_identifiers_are_compared_numerically(self):
+        text = "# C\n\n## [Unreleased]\n\n## [1.0.0-rc.2] - 2026-01-02\n\n### Added\n\n- two\n\n## [1.0.0-rc.10] - 2026-01-01\n\n### Added\n\n- ten\n"
+        self.assertIn("ORDER", codes(text))
+
+    def test_release_headings_inside_fenced_examples_are_ignored(self):
+        text = "# C\n\n## [Unreleased]\n\n## [1.0.0] - 2026-01-01\n\n### Added\n\n- example\n\n````markdown\n## [9.9.9] - 2099-01-01\n\n### Improved\n```\n````\n\n[1.0.0]: https://example.invalid\n"
+        issue_codes = codes(text)
+        self.assertNotIn("FUTURE_DATE", issue_codes)
+        self.assertNotIn("ORDER", issue_codes)
+        self.assertNotIn("UNKNOWN_SECTION", issue_codes)
+        self.assertNotIn("NO_LINK", issue_codes)
+
     def test_duplicate_unreleased(self):
         text = "# C\n\n## [Unreleased]\n\n## [Unreleased]\n"
         self.assertIn("DUPLICATE_UNRELEASED", codes(text))

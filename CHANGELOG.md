@@ -5,6 +5,14 @@
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-13
+
+### Fixed
+
+- Compare SemVer prerelease identifiers correctly, including numeric identifiers.
+- Ignore release headings and link definitions inside fenced Markdown examples.
+- Add installable wheel and source distributions to tagged GitHub releases.
+
 ## [0.1.2] - 2026-10-11
 
 ### Added
@@ -27,5 +35,6 @@
 - CONTRIBUTING.md и SECURITY.md.
 
 [0.1.2]: https://github.com/GhosTnever-lkm/changelog-lint/compare/v0.1.1...v0.1.2
+[0.1.3]: https://github.com/GhosTnever-lkm/changelog-lint/releases/tag/v0.1.3
 [0.1.1]: https://github.com/GhosTnever-lkm/changelog-lint/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/GhosTnever-lkm/changelog-lint/releases/tag/v0.1.0
