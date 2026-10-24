@@ -11,7 +11,12 @@ SECTIONS = ("Added", "Changed", "Deprecated", "Removed", "Fixed", "Security")
 VERSION_HEADING_RE = re.compile(r"^##\s+\[(?P<ver>[^\]]+)\](?:\s+-\s+(?P<date>\S+))?\s*$")
 UNRELEASED_RE = re.compile(r"^##\s+\[Unreleased\]\s*$", re.IGNORECASE)
 SECTION_RE = re.compile(r"^###\s+(?P<name>.+?)\s*$")
-SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
+SEMVER_RE = re.compile(
+    r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+    r"(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)"
+    r"(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?"
+    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
+)
 LINK_DEF_RE = re.compile(r"^\[(?P<ver>[^\]]+)\]:\s+\S+")
 FENCE_OPEN_RE = re.compile(r"^\s*(?P<fence>`{3,}|~{3,}).*$")
 FENCE_CLOSE_RE = re.compile(r"^\s*(?P<fence>`{3,}|~{3,})\s*$")
@@ -26,7 +31,9 @@ class Finding:
 
 
 def _semver_key(version: str) -> tuple[int, int, int, int, tuple[tuple[int, int | str], ...]]:
-    core, separator, prerelease = version.partition("-")
+    # Build metadata is valid SemVer but must not affect precedence.
+    precedence = version.partition("+")[0]
+    core, separator, prerelease = precedence.partition("-")
     major, minor, patch = (int(part) for part in core.split("."))
     if not separator:
         return major, minor, patch, 1, ()
