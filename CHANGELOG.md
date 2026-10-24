@@ -5,6 +5,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Update the README wheel installation example to the current package version and test that it stays in sync.
+
 ## [0.1.4] - 2026-10-25
 
 ### Fixed

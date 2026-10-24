@@ -7,7 +7,7 @@
 Требуется Python 3.10+. Готовый wheel можно скачать в [последнем релизе](https://github.com/GhosTnever-lkm/changelog-lint/releases/latest):
 
 ```bash
-python -m pip install changelog_lint-0.1.3-py3-none-any.whl
+python -m pip install changelog_lint-0.1.4-py3-none-any.whl
 changelog-lint CHANGELOG.md --strict
 ```
 
