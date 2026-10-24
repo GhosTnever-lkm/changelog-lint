@@ -5,6 +5,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from changelog_lint import __version__
 from changelog_lint.cli import main
 from changelog_lint.core import lint
 
@@ -92,6 +93,11 @@ class CliTests(unittest.TestCase):
         code, out = self.run_cli(["examples/CHANGELOG.md"])
         self.assertEqual(code, 0)
         self.assertIn("OK", out)
+
+    def test_readme_wheel_command_matches_package_version(self):
+        readme = Path("README.md").read_text(encoding="utf-8")
+        expected = f"python -m pip install changelog_lint-{__version__}-py3-none-any.whl"
+        self.assertIn(expected, readme)
 
     def test_error_exit_one_and_missing_file_two(self):
         tmp = Path(tempfile.mkdtemp()) / "CHANGELOG.md"
