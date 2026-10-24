@@ -46,6 +46,18 @@ class RuleTests(unittest.TestCase):
         text = "# C\n\n## [Unreleased]\n\n## [1.0.0-rc.2] - 2026-01-02\n\n### Added\n\n- two\n\n## [1.0.0-rc.10] - 2026-01-01\n\n### Added\n\n- ten\n"
         self.assertIn("ORDER", codes(text))
 
+    def test_invalid_semver_identifiers_warn(self):
+        for version in ("01.0.0", "1.0.0-01", "1.0.0-alpha..beta", "1.0.0-alpha."):
+            with self.subTest(version=version):
+                text = f"# C\n\n## [Unreleased]\n\n## [{version}] - 2026-01-01\n\n### Added\n\n- item\n"
+                self.assertIn("NON_SEMVER", codes(text))
+
+    def test_build_metadata_is_valid_and_does_not_change_precedence(self):
+        text = "# C\n\n## [Unreleased]\n\n## [1.0.0+build.2] - 2026-01-02\n\n### Added\n\n- newer\n\n## [1.0.0+build.1] - 2026-01-01\n\n### Added\n\n- same precedence\n"
+        issue_codes = codes(text)
+        self.assertNotIn("NON_SEMVER", issue_codes)
+        self.assertIn("ORDER", issue_codes)
+
     def test_release_headings_inside_fenced_examples_are_ignored(self):
         text = "# C\n\n## [Unreleased]\n\n## [1.0.0] - 2026-01-01\n\n### Added\n\n- example\n\n````markdown\n## [9.9.9] - 2099-01-01\n\n### Improved\n```\n````\n\n[1.0.0]: https://example.invalid\n"
         issue_codes = codes(text)
