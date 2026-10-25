@@ -99,6 +99,14 @@ class CliTests(unittest.TestCase):
         expected = f"python -m pip install changelog_lint-{__version__}-py3-none-any.whl"
         self.assertIn(expected, readme)
 
+    def test_readme_action_pins_match_workflows(self):
+        readme = Path("README.md").read_text(encoding="utf-8")
+        for action in ("actions/checkout@", "actions/setup-python@"):
+            documented = next(line.strip() for line in readme.splitlines() if line.strip().startswith("- uses: " + action))
+            for workflow in (".github/workflows/ci.yml", ".github/workflows/release.yml"):
+                configured = next(line.strip() for line in Path(workflow).read_text(encoding="utf-8").splitlines() if line.strip().startswith("- uses: " + action))
+                self.assertEqual(documented.removeprefix("- "), configured.removeprefix("- "), workflow)
+
     def test_error_exit_one_and_missing_file_two(self):
         tmp = Path(tempfile.mkdtemp()) / "CHANGELOG.md"
         tmp.write_text("# C\n\n## Random\n", encoding="utf-8")
